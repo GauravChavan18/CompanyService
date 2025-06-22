@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Payslip</title>
+    <style>
+        @page {
+          size: A4;
+          margin: 30pt;
+        }
+
+        body {
+          font-family: Arial, sans-serif;
+          font-size: 11px;
+          color: #000;
+          margin: 30pt;
+        }
+
+        h2 {
+          text-align: center;
+          font-size: 15px;
+          margin-bottom: 20px;
+          font-weight: bold;
+          text-transform: uppercase;
+        }
+
+        .section-title {
+          font-size: 12px;
+          font-weight: bold;
+          margin: 20px 0 8px;
+          border-left: 4px solid #004080;
+          padding-left: 6px;
+          background-color: #f0f0f0;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 20px;
+        }
+
+        th, td {
+          border: 1px solid #000;
+          padding: 5px 7px;
+          font-size: 11px;
+        }
+
+        th {
+          background-color: #f5f5f5;
+          font-weight: bold;
+          text-align: left;
+        }
+
+        .right {
+          text-align: right;
+        }
+
+        .net-pay {
+          font-weight: bold;
+          background-color: #e6f2ff;
+        }
+
+        footer {
+          margin-top: 30px;
+          font-size: 10px;
+          color: #444;
+          text-align: center;
+          border-top: 1px dashed #aaa;
+          padding-top: 10px;
+        }
+
+        table, tr, td, th, h2 {
+          page-break-inside: avoid;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2 th:text="'Payslip - ' + ${data.employee.employeeName}">Payslip Month</h2>
+
+<div class="section-title">Employee Details</div>
+<table>
+    <tr>
+        <th>Name</th><td th:text="${data.employee.employeeName}">Name</td>
+        <th>Employee ID</th><td th:text="${data.employee.employeeId}">ID</td>
+    </tr>
+    <tr>
+        <th>PAN</th><td th:text="${data.employee.pan}">PAN</td>
+        <th>UAN</th><td th:text="${data.employee.uanNumber}">UAN</td>
+    </tr>
+    <tr>
+        <th>PF Number</th><td th:text="${data.employee.pfNumber}">PF</td>
+        <th>ESI Number</th><td th:text="${data.employee.esiNumber}">ESI</td>
+    </tr>
+    <tr>
+        <th>Department</th><td th:text="${data.employee.department}">Dept</td>
+        <th>Function</th><td th:text="${data.employee.function}">Func</td>
+    </tr>
+    <tr>
+        <th>Bank</th><td th:text="${data.employee.bank}">Bank</td>
+        <th>Account No</th><td th:text="${data.employee.bankAccount}">Account</td>
+    </tr>
+    <tr>
+        <th>Location</th><td th:text="${data.employee.location}">Location</td>
+        <th>Currency</th><td th:text="${data.employee.currency}">Currency</td>
+    </tr>
+    <tr>
+        <th>Hire Date</th><td th:text="${data.employee.hireDate}">Hire Date</td>
+        <th>Pay Period</th><td th:text="${data.employee.startDate + ' to ' + data.employee.endDate}">Period</td>
+    </tr>
+    <tr>
+        <th>Days Payable</th><td colspan="3" th:text="${data.employee.daysPayable}">Days</td>
+    </tr>
+</table>
+
+<div class="section-title">Earnings</div>
+<table>
+    <tr><th>Description</th><th class="right">Amount (₹)</th></tr>
+    <tr><td>Base Salary</td><td class="right" th:text="${data.earnings.baseSalary}">0</td></tr>
+    <tr><td>HRA</td><td class="right" th:text="${data.earnings.hra}">0</td></tr>
+    <tr><td>Flexi Pay</td><td class="right" th:text="${data.earnings.flexiPay}">0</td></tr>
+    <tr><td>Shift Allowance</td><td class="right" th:text="${data.earnings.shiftAllowance}">0</td></tr>
+    <tr><td>Bonus</td><td class="right" th:text="${data.earnings.bonus}">0</td></tr>
+    <tr><td>Variable Pay</td><td class="right" th:text="${data.earnings.variablePay}">0</td></tr>
+    <tr><td><strong>Total Master Earnings</strong></td><td class="right" th:text="${data.earnings.totalEarningsMaster}">0</td></tr>
+    <tr><td><strong>Adjustment</strong></td><td class="right" th:text="${data.earnings.totalEarningsAdj}">0</td></tr>
+    <tr><td><strong>Total Earnings Paid</strong></td><td class="right" th:text="${data.earnings.totalEarningsPaid}">0</td></tr>
+</table>
+
+<div class="section-title">Deductions</div>
+<table>
+    <tr><th>Description</th><th class="right">Amount (₹)</th></tr>
+    <tr><td>Provident Fund</td><td class="right" th:text="${data.totalDeductions.pfDeducted}">0</td></tr>
+    <tr><td>Professional Tax</td><td class="right" th:text="${data.totalDeductions.profTax}">0</td></tr>
+    <tr><td>AWT Recovery</td><td class="right" th:text="${data.totalDeductions.awtDeduction}">0</td></tr>
+    <tr><td><strong>Total Deductions</strong></td><td class="right" th:text="${data.totalDeductions.totalDeductions}">0</td></tr>
+</table>
+
+<div class="section-title">Pay Summary</div>
+<table>
+    <tr>
+        <th>Gross Earnings</th>
+        <th>Total Deductions</th>
+        <th>Net Pay</th>
+    </tr>
+    <tr>
+        <td class="right" th:text="${data.earnings.grossEarnings}">0</td>
+        <td class="right" th:text="${data.totalDeductions.totalDeductions}">0</td>
+        <td class="right net-pay" th:text="${data.earnings.grossEarnings - data.totalDeductions.totalDeductions}">0</td>
+    </tr>
+</table>
+
+<footer>
+    <p>This is a system-generated payslip and does not require a signature.</p>
+</footer>
+
+</body>
+</html>
