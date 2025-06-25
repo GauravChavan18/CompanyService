@@ -7,7 +7,9 @@ import java.io.OutputStream;
 
 public interface PaySlipService {
 
+    PaySlip CreatePaySlip(Long id , Earnings earnings);
+
     void getPayslipPdf(Long id, OutputStream outputStream);
 
-    PaySlip CreatePaySlip(Long id , Earnings earnings);
+    void getPaySlipPdfByEmployeeIdAndMonth(Long id , String PayMonth , OutputStream outputStream);
 }

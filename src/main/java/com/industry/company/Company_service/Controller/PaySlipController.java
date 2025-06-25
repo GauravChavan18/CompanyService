@@ -33,6 +33,19 @@ public class PaySlipController {
         }
     }
 
+    @GetMapping("/{id}/{PayMonth}/pdf")
+    public void getPaySlipPdfByEmployeeIdAndMonth(@PathVariable Long id , @PathVariable String PayMonth , HttpServletResponse response)
+    {
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=payslip_" + id + ".pdf");
+
+        try (OutputStream outputStream = response.getOutputStream()) {
+            paySlipService.getPaySlipPdfByEmployeeIdAndMonth(id,PayMonth,outputStream);
+        } catch (IOException e) {
+            throw new RuntimeException("Error writing PDF to response", e);
+        }
+    }
+
     @PostMapping("/{id}")
     public ResponseEntity<PaySlip> CreatePaySlip(@PathVariable long id , @RequestBody Earnings earnings)
     {

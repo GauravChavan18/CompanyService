@@ -38,8 +38,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         employee.setCompany(company);
 
-        String month =employee.getStartDate().getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
-        employee.setPayMonth(month);
         emploeeRepository.save(employee);
 
 

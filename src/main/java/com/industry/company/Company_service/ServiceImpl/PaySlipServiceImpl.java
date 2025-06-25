@@ -11,12 +11,14 @@ import com.industry.company.Company_service.exception.ResourceNotFoundException;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.io.OutputStream;
+import java.time.format.TextStyle;
+import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +36,33 @@ public class PaySlipServiceImpl implements PaySlipService {
 
         PaySlip paySlip = paySlipRepository.findByEmployeeEmployeeId(id)
                                 .orElseThrow(()-> new ResourceNotFoundException("PaySlip not found "));
+
+
+        Context context = new Context();
+        context.setVariable("data", paySlip);
+        String html = templateEngine.process("payslip", context);
+        log.info("Rendered HTML:\n{}", html);
+
+        try {
+            PdfRendererBuilder builder = new PdfRendererBuilder();
+            builder.useFastMode();
+            builder.withHtmlContent(html, null);
+            builder.toStream(outputStream);
+            builder.run();
+        } catch (Exception e) {
+
+
+
+            
+            throw new RuntimeException("Failed to generate PDF", e);
+        }
+
+    }
+
+    @Override
+    public void getPaySlipPdfByEmployeeIdAndMonth(Long id, String PayMonth, OutputStream outputStream) {
+        PaySlip paySlip = paySlipRepository.findByEmployeeEmployeeIdAndEarnings_PayMonth(id,PayMonth)
+                .orElseThrow(()-> new ResourceNotFoundException("PaySlip not found "));
 
         Context context = new Context();
         context.setVariable("data", paySlip);
@@ -65,7 +94,13 @@ public class PaySlipServiceImpl implements PaySlipService {
         Earnings earningsTemp = new Earnings();
 
         earningsTemp.setBaseSalary(earnings.getBaseSalary());
-
+        earningsTemp.setPayMonth(earnings.getPayMonth());
+        earningsTemp.setStartDate(earnings.getStartDate());
+        earningsTemp.setEndDate(earnings.getEndDate());
+        log.info(String.valueOf(earnings.getEndDate().getDayOfMonth()));
+        earningsTemp.setDaysPayable(earnings.getEndDate().getDayOfMonth() - earnings.getStartDate().getDayOfMonth());
+        earningsTemp.setPayMonth(earnings.getStartDate().getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH));
+        earningsTemp.setCurrency("INR");
         earningsTemp.setHra(15000);
         earningsTemp.setFlexiPay(3000);
         earningsTemp.setBonus(4000);
@@ -83,9 +118,6 @@ public class PaySlipServiceImpl implements PaySlipService {
         deductions.setAwtDeduction(5);
         deductions.calculateTotals();
         paySlip.setTotalDeductions(deductions);
-
-
-
 
         earningsTemp.setGrossEarnings(earningsTemp.getGrossEarnings()-deductions.getTotalDeductions());
         paySlip.setEarnings(earningsTemp);

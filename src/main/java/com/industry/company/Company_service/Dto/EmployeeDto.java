@@ -27,11 +27,6 @@ public class EmployeeDto {
     private String bankAccount;
 
     private LocalDate hireDate;
-    private LocalDate start;
-    private LocalDate end;
-    private String payMonth;
-    private double daysPayable;
-    private String currency;
 
     private String companyName;
 }

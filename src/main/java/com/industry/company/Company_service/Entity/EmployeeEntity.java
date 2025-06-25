@@ -8,6 +8,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 import java.time.format.TextStyle;
+import java.util.List;
 import java.util.Locale;
 
 @Entity
@@ -35,19 +36,15 @@ public class EmployeeEntity {
     private String bankAccount;
 
     private LocalDate hireDate;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private String payMonth = LocalDate.now().getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
-    private double daysPayable;
-    private String currency;
 
     @ManyToOne
     @JoinColumn(name = "companyName" , nullable=false)
     @JsonIgnore
     public CompanyEntity company;
 
-    @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL)
-    private PaySlip payslip;
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<PaySlip> payslip;
 
 
 }
