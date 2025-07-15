@@ -1,9 +1,7 @@
 package com.industry.company.Company_service.ServiceImpl;
 
-import com.industry.company.Company_service.Entity.Earnings;
-import com.industry.company.Company_service.Entity.EmployeeEntity;
-import com.industry.company.Company_service.Entity.PaySlip;
-import com.industry.company.Company_service.Entity.TotalDeductions;
+import com.industry.company.Company_service.Entity.*;
+import com.industry.company.Company_service.Repository.AttendenceRepository;
 import com.industry.company.Company_service.Repository.EmploeeRepository;
 import com.industry.company.Company_service.Repository.PaySlipRepository;
 import com.industry.company.Company_service.Service.PaySlipService;
@@ -16,6 +14,8 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.io.OutputStream;
+import java.time.LocalDate;
+import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
@@ -31,16 +31,20 @@ public class PaySlipServiceImpl implements PaySlipService {
 
     private final SpringTemplateEngine templateEngine;
 
+    private final AttendenceRepository attendenceRepository;
+
     @Override
     public void getPayslipPdf(Long id , OutputStream outputStream) {
 
-        PaySlip paySlip = paySlipRepository.findByEmployeeEmployeeId(id)
-                                .orElseThrow(()-> new ResourceNotFoundException("PaySlip not found "));
+        List<PaySlip> paySlip = paySlipRepository.findByEmployeeEmployeeId(id);
 
+        paySlip.forEach(slip ->{
+            log.info(slip.getEarnings().getPayMonth());
+        } );
 
         Context context = new Context();
         context.setVariable("data", paySlip);
-        String html = templateEngine.process("payslip", context);
+        String html = templateEngine.process("paySlipList", context);
         log.info("Rendered HTML:\n{}", html);
 
         try {
@@ -51,9 +55,6 @@ public class PaySlipServiceImpl implements PaySlipService {
             builder.run();
         } catch (Exception e) {
 
-
-
-            
             throw new RuntimeException("Failed to generate PDF", e);
         }
 
@@ -124,5 +125,62 @@ public class PaySlipServiceImpl implements PaySlipService {
 
         paySlipRepository.save(paySlip);
         return paySlip;
+    }
+
+    @Override
+    public PaySlip CreatePaySlipByMonth(Long employeeId, String PayMonth, Earnings earnings) {
+        EmployeeEntity employee = emploeeRepository.findById(employeeId)
+                .orElseThrow(()->new ResourceNotFoundException("Employee not found"));
+
+
+        PaySlip paySlip=new PaySlip();
+        paySlip.setEmployee(employee);
+
+
+        Double overtimeHrs =2.5;
+        Double ovetimePay = overtimeHrs *100;
+
+        LocalDate StartDate = LocalDate.of(LocalDate.now().getYear(), java.time.Month.valueOf(PayMonth.toUpperCase()),1);
+        LocalDate EndDate = StartDate.withDayOfMonth(StartDate.lengthOfMonth());
+
+        log.info(StartDate+"");
+        log.info(EndDate+"");
+        log.info(PayMonth);
+        List<AttendanceRecord> records =attendenceRepository.findByEmployeeIdAndTodayDateBetween(employeeId,StartDate,EndDate);
+
+        records.forEach((record -> {
+            log.info(record.getOvertimeHours()+"");
+        }));
+        Earnings earningsTemp = new Earnings();
+        earningsTemp.setBaseSalary(records.size() * 800 + overtimeHrs);
+        earningsTemp.setPayMonth(PayMonth);
+        earningsTemp.setStartDate(StartDate);
+        earningsTemp.setEndDate(EndDate);
+        log.info(String.valueOf(records.size()));
+        earningsTemp.setDaysPayable(records.size());
+        earningsTemp.setCurrency("INR");
+        earningsTemp.setHra(15000);
+        earningsTemp.setFlexiPay(3000);
+        earningsTemp.setBonus(4000);
+        earningsTemp.setVariablePay(2000);
+
+        earningsTemp.setShiftAllowance(earnings.getShiftAllowance());
+
+        earningsTemp.calculateTotals();
+
+        TotalDeductions deductions = new TotalDeductions();
+        deductions.setPfDeducted(1500);
+        deductions.setProfTax(250);
+        deductions.setAwtDeduction(5);
+        deductions.calculateTotals();
+        paySlip.setTotalDeductions(deductions);
+
+        earningsTemp.setGrossEarnings(earningsTemp.getGrossEarnings()-deductions.getTotalDeductions());
+        paySlip.setEarnings(earningsTemp);
+
+        paySlipRepository.save(paySlip);
+        return paySlip;
+
+
     }
 }

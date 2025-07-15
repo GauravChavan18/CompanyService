@@ -52,4 +52,11 @@ public class PaySlipController {
         PaySlip paySlip =paySlipService.CreatePaySlip(id ,earnings);
         return new ResponseEntity<>(paySlip,HttpStatus.CREATED);
     }
+
+    @PostMapping("/{id}/{PayMonth}")
+    public ResponseEntity<PaySlip> CreatePaySlipByMonth(@PathVariable long id , @PathVariable String PayMonth , @RequestBody Earnings earnings)
+    {
+        PaySlip paySlip=paySlipService.CreatePaySlipByMonth(id,PayMonth,earnings);
+        return new ResponseEntity<>(paySlip, HttpStatus.CREATED);
+    }
 }

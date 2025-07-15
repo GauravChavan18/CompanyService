@@ -46,5 +46,7 @@ public class EmployeeEntity {
     @JsonIgnore
     private List<PaySlip> payslip;
 
-
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<AttendanceRecord> attendanceRecords;
 }
