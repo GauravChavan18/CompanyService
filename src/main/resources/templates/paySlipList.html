@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Payslip List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        h2 {
+            color: #333;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Payslip List</h2>
+
+<ul>
+    <li th:each="payslip : ${data}">
+        <a th:href="@{'/' + ${payslip.employee.employeeId} + '/' + ${payslip.earnings.payMonth} + '/pdf'}"
+           th:download="'Payslip_' + ${payslip.earnings.payMonth} + '.pdf'"
+           th:text="'Download Payslip for ' + ${payslip.earnings.payMonth}"></a>
+    </li>
+</ul>
+
+</body>
+</html>

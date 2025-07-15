@@ -103,14 +103,15 @@
     </tr>
     <tr>
         <th>Location</th><td th:text="${data.employee.location}">Location</td>
-        <th>Currency</th><td th:text="${data.employee.currency}">Currency</td>
+        <th>Currency</th><td>INR</td>
     </tr>
     <tr>
         <th>Hire Date</th><td th:text="${data.employee.hireDate}">Hire Date</td>
-        <th>Pay Period</th><td th:text="${data.employee.startDate + ' to ' + data.employee.endDate}">Period</td>
+        <th>Pay Period</th><td th:text="${data.earnings.startDate + ' to ' + data.earnings.endDate}">Period</td>
     </tr>
     <tr>
-        <th>Days Payable</th><td colspan="3" th:text="${data.employee.daysPayable}">Days</td>
+        <th>Pay Month</th><td th:text="${data.earnings.payMonth}">Pay Month</td>
+        <th>Days Payable</th><td  th:text="${data.earnings.daysPayable}">Days</td>
     </tr>
 </table>
 

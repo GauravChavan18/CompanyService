@@ -1,6 +1,6 @@
 package com.industry.company.Company_service.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -13,8 +13,8 @@ public class PaySlip {
     private Long PayslipId;
 
 
-    @OneToOne
-    @JoinColumn(name = "employeeId", nullable = false, unique = true)
+    @ManyToOne
+    @JoinColumn(name = "employeeId", nullable = false)
     private EmployeeEntity employee;
 
     @Embedded
