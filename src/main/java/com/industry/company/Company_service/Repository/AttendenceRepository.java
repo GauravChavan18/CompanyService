@@ -29,4 +29,7 @@ public interface AttendenceRepository extends JpaRepository<AttendanceRecord, Lo
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
+
+
+    Optional<AttendanceRecord> findByEmployeeEmployeeIdAndTodayDate(Long employeeId , LocalDate todayDate);
 }
