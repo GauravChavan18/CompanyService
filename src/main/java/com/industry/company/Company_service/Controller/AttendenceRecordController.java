@@ -1,5 +1,6 @@
 package com.industry.company.Company_service.Controller;
 
+import com.industry.company.Company_service.Dto.PunchRequestDto;
 import com.industry.company.Company_service.Entity.AttendanceRecord;
 import com.industry.company.Company_service.Service.AttendenceRecordService;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +16,9 @@ public class AttendenceRecordController {
     private  final AttendenceRecordService attendenceRecordService;
 
     @PostMapping("/{id}/{PayMonth}")
-    public ResponseEntity<AttendanceRecord> FillAttendenceForDay(@RequestBody AttendanceRecord attendanceRecord, @PathVariable Long id )
+    public ResponseEntity<AttendanceRecord> FillAttendenceForDay(@RequestBody PunchRequestDto punchRequestDto, @PathVariable Long id )
     {
-        AttendanceRecord attendancerecord = attendenceRecordService.FillAttendenceForDay(attendanceRecord,id);
+        AttendanceRecord attendancerecord = attendenceRecordService.FillAttendenceForDay(punchRequestDto,id);
 
         return new ResponseEntity<>(attendancerecord, HttpStatus.CREATED);
     }
