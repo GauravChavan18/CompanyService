@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
+import java.util.List;
 import java.util.Locale;
 
 @Service
@@ -67,12 +68,19 @@ public class AttendenceRecordServiceImpl implements AttendenceRecordService {
                 attendancerecord.setOvertimeHours(0.0);
             }
         }
-        else if(attendancerecord.getStartTime() == null || attendancerecord.getEndTime() ==null)
-        {
+        else {
             attendancerecord.setAttendenceStatus(AttendenceStatus.ABSENT);
         }
 
         attendenceRepository.save(attendancerecord);
         return attendancerecord;
+    }
+
+    @Override
+    public List<AttendanceRecord> FillAttendenceForMonth(List<PunchRequestDto> punchRequestDtos, Long employeeId) {
+
+
+       return punchRequestDtos.stream().map((punchRequestDto -> FillAttendenceForDay(punchRequestDto, employeeId))).toList();
+
     }
 }

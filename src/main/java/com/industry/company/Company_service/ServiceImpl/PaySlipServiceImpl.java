@@ -15,7 +15,6 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.io.OutputStream;
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
@@ -33,32 +32,7 @@ public class PaySlipServiceImpl implements PaySlipService {
 
     private final AttendenceRepository attendenceRepository;
 
-    @Override
-    public void getPayslipPdf(Long id , OutputStream outputStream) {
 
-        List<PaySlip> paySlip = paySlipRepository.findByEmployeeEmployeeId(id);
-
-        paySlip.forEach(slip ->{
-            log.info(slip.getEarnings().getPayMonth());
-        } );
-
-        Context context = new Context();
-        context.setVariable("data", paySlip);
-        String html = templateEngine.process("paySlipList", context);
-        log.info("Rendered HTML:\n{}", html);
-
-        try {
-            PdfRendererBuilder builder = new PdfRendererBuilder();
-            builder.useFastMode();
-            builder.withHtmlContent(html, null);
-            builder.toStream(outputStream);
-            builder.run();
-        } catch (Exception e) {
-
-            throw new RuntimeException("Failed to generate PDF", e);
-        }
-
-    }
 
     @Override
     public void getPaySlipPdfByEmployeeIdAndMonth(Long id, String PayMonth, OutputStream outputStream) {
@@ -166,8 +140,8 @@ public class PaySlipServiceImpl implements PaySlipService {
 
     public Earnings EarningsCalculation(Earnings earnings , List<AttendanceRecord> records , String PayMonth)
     {
-        Double overtimeHrs =2.5;
-        Double overtimePay = overtimeHrs *100;
+        double overtimeHrs =2.5;
+        double overtimePay = overtimeHrs *100;
 
         LocalDate StartDate = LocalDate.of(LocalDate.now().getYear(), java.time.Month.valueOf(PayMonth.toUpperCase()),1);
         LocalDate EndDate = StartDate.withDayOfMonth(StartDate.lengthOfMonth());
@@ -194,11 +168,8 @@ public class PaySlipServiceImpl implements PaySlipService {
 
     public Long findTheDaysPayable(List<AttendanceRecord> records)
     {
-        Long days =records.stream()
-                .filter((record) ->{
-                    return record.getAttendenceStatus().equals(AttendenceStatus.PRESENT);
-                }).count();
+        return records.stream()
+                .filter((record) -> record.getAttendenceStatus().equals(AttendenceStatus.PRESENT)).count();
 
-        return days;
     }
 }

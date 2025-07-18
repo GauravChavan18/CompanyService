@@ -9,4 +9,6 @@ import java.util.List;
 public interface AttendenceRecordService {
 
     public AttendanceRecord FillAttendenceForDay(PunchRequestDto punchRequestDto, Long employeeId );
+
+    public List<AttendanceRecord> FillAttendenceForMonth(List<PunchRequestDto> punchRequestDtos , Long employeeId);
 }
