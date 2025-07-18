@@ -14,7 +14,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ComplanyServiceImpl implements CompanyService {
+public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
     private final ModelMapper modelMapper;
@@ -24,7 +24,18 @@ public class ComplanyServiceImpl implements CompanyService {
 
         CompanyEntity company = modelMapper.map(companyDto , CompanyEntity.class);
 
-        companyRepository.save(company);
+//        companyRepository.findByCompanyName(company.getCompanyName()).stream().toList().size()==1
+        if(companyRepository.findAll().stream().toList().size()==0)
+        {
+            companyRepository.save(company);
+        }
+        else if(companyRepository.findByCompanyName(company.getCompanyName()).stream().toList().size()==1)
+        {
+
+        }
+        else{
+            companyRepository.save(company);
+        }
 
         return modelMapper.map(company ,CompanyDto.class);
     }

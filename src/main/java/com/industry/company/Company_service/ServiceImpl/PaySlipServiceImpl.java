@@ -133,54 +133,72 @@ public class PaySlipServiceImpl implements PaySlipService {
                 .orElseThrow(()->new ResourceNotFoundException("Employee not found"));
 
 
-        PaySlip paySlip=new PaySlip();
-        paySlip.setEmployee(employee);
-
-
-        Double overtimeHrs =2.5;
-        Double ovetimePay = overtimeHrs *100;
-
         LocalDate StartDate = LocalDate.of(LocalDate.now().getYear(), java.time.Month.valueOf(PayMonth.toUpperCase()),1);
         LocalDate EndDate = StartDate.withDayOfMonth(StartDate.lengthOfMonth());
-
-        log.info(StartDate+"");
-        log.info(EndDate+"");
-        log.info(PayMonth);
         List<AttendanceRecord> records =attendenceRepository.findByEmployeeIdAndTodayDateBetween(employeeId,StartDate,EndDate);
 
-        records.forEach((record -> {
-            log.info(record.getOvertimeHours()+"");
-        }));
-        Earnings earningsTemp = new Earnings();
-        earningsTemp.setBaseSalary(records.size() * 800 + overtimeHrs);
-        earningsTemp.setPayMonth(PayMonth);
-        earningsTemp.setStartDate(StartDate);
-        earningsTemp.setEndDate(EndDate);
-        log.info(String.valueOf(records.size()));
-        earningsTemp.setDaysPayable(records.size());
-        earningsTemp.setCurrency("INR");
-        earningsTemp.setHra(15000);
-        earningsTemp.setFlexiPay(3000);
-        earningsTemp.setBonus(4000);
-        earningsTemp.setVariablePay(2000);
+        Earnings earningsTemp = EarningsCalculation(earnings , records ,PayMonth);
 
-        earningsTemp.setShiftAllowance(earnings.getShiftAllowance());
-
-        earningsTemp.calculateTotals();
 
         TotalDeductions deductions = new TotalDeductions();
         deductions.setPfDeducted(1500);
         deductions.setProfTax(250);
         deductions.setAwtDeduction(5);
         deductions.calculateTotals();
-        paySlip.setTotalDeductions(deductions);
 
         earningsTemp.setGrossEarnings(earningsTemp.getGrossEarnings()-deductions.getTotalDeductions());
+
+
+
+        PaySlip paySlip= paySlipRepository
+                .findByEmployeeEmployeeIdAndEarnings_PayMonth(employeeId,PayMonth)
+                .orElse(new PaySlip());
+
+        paySlip.setEmployee(employee);
         paySlip.setEarnings(earningsTemp);
+        paySlip.setTotalDeductions(deductions);
 
         paySlipRepository.save(paySlip);
+
         return paySlip;
+    }
 
 
+    public Earnings EarningsCalculation(Earnings earnings , List<AttendanceRecord> records , String PayMonth)
+    {
+        Double overtimeHrs =2.5;
+        Double overtimePay = overtimeHrs *100;
+
+        LocalDate StartDate = LocalDate.of(LocalDate.now().getYear(), java.time.Month.valueOf(PayMonth.toUpperCase()),1);
+        LocalDate EndDate = StartDate.withDayOfMonth(StartDate.lengthOfMonth());
+
+        Earnings earningsTemp = new Earnings();
+        Long daysPayable = findTheDaysPayable(records);
+        earningsTemp.setBaseSalary(daysPayable * 800 + overtimePay);
+        earningsTemp.setPayMonth(PayMonth);
+        earningsTemp.setStartDate(StartDate);
+        earningsTemp.setEndDate(EndDate);
+        earningsTemp.setDaysPayable(daysPayable);
+        earningsTemp.setCurrency("INR");
+        earningsTemp.setHra(15000);
+        earningsTemp.setFlexiPay(3000);
+        earningsTemp.setBonus(4000);
+        earningsTemp.setVariablePay(2000);
+        earningsTemp.setShiftAllowance(earnings.getShiftAllowance());
+
+        earningsTemp.calculateTotals();
+
+        return earningsTemp;
+
+    }
+
+    public Long findTheDaysPayable(List<AttendanceRecord> records)
+    {
+        Long days =records.stream()
+                .filter((record) ->{
+                    return record.getAttendenceStatus().equals(AttendenceStatus.PRESENT);
+                }).count();
+
+        return days;
     }
 }

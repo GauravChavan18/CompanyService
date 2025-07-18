@@ -13,6 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.format.TextStyle;
+import java.util.List;
 import java.util.Locale;
 
 @Service
@@ -42,5 +43,22 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 
         return modelMapper.map(employee,EmployeeDto.class);
+    }
+
+    @Override
+    public List<EmployeeDto> GetEmployeesByCompanyName(String companyName) {
+
+        CompanyEntity company = companyRepository.findByCompanyName(companyName)
+                .orElseThrow(()-> new ResourceNotFoundException("Company not found"));
+
+        List<EmployeeEntity> employeeEntities =emploeeRepository.findByCompanyCompanyName(companyName);
+
+        List<EmployeeDto> employeeDtos = employeeEntities
+                .stream()
+                .map((employee -> modelMapper.map(employee ,EmployeeDto.class)))
+                .toList();
+
+
+        return employeeDtos;
     }
 }

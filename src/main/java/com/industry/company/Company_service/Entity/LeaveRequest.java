@@ -3,29 +3,27 @@ package com.industry.company.Company_service.Entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Entity
 @Data
-public class AttendanceRecord {
+@RequiredArgsConstructor
+public class LeaveRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long Id;
+    private Long LeaveRequestId;
 
-    private String payMonth;
+    private String LeaveReason;
 
-    private LocalDate todayDate;
+    private LocalDate LeaveStartDate;
 
-    private LocalTime startTime;
-    private LocalTime EndTime;
+    private LocalDate LeaveEndDate;
 
-    private Double overtimeHours;
-
-    @Enumerated(value = EnumType.STRING)
-    public AttendenceStatus attendenceStatus;
+    @Enumerated(EnumType.STRING)
+    private LeaveRequestStatus leaveRequestStatus;
 
     @ManyToOne
     @JoinColumn(name = "employeeId", nullable = false)

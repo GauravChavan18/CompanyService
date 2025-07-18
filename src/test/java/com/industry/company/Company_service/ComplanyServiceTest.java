@@ -2,7 +2,7 @@ package com.industry.company.Company_service;
 
 import com.industry.company.Company_service.Dto.CompanyDto;
 import com.industry.company.Company_service.Repository.CompanyRepository;
-import com.industry.company.Company_service.ServiceImpl.ComplanyServiceImpl;
+import com.industry.company.Company_service.ServiceImpl.CompanyServiceImpl;
 import com.industry.company.Company_service.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ComplanyServiceTest {
 
     @Autowired
-    private ComplanyServiceImpl companyService;
+    private CompanyServiceImpl companyService;
 
     @Autowired
     private CompanyRepository companyRepository;

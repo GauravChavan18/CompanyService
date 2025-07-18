@@ -19,7 +19,7 @@ public class CompanyController {
     private final CompanyService companyService;
 
     @PostMapping
-    public ResponseEntity<CompanyDto> addCompany(@RequestBody CompanyDto companyDto)
+    public ResponseEntity<?> addCompany(@RequestBody CompanyDto companyDto)
     {
         CompanyDto newCompanyDto = companyService.addCompany(companyDto);
 

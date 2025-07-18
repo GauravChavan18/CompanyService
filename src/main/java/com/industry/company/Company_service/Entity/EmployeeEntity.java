@@ -49,4 +49,9 @@ public class EmployeeEntity {
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<AttendanceRecord> attendanceRecords;
+
+    @OneToMany(mappedBy = "employee" , cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<LeaveRequest> leaveRequestList;
+
 }

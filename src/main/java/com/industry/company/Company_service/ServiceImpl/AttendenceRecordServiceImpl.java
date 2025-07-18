@@ -2,6 +2,7 @@ package com.industry.company.Company_service.ServiceImpl;
 
 import com.industry.company.Company_service.Dto.PunchRequestDto;
 import com.industry.company.Company_service.Entity.AttendanceRecord;
+import com.industry.company.Company_service.Entity.AttendenceStatus;
 import com.industry.company.Company_service.Entity.EmployeeEntity;
 import com.industry.company.Company_service.Repository.AttendenceRepository;
 import com.industry.company.Company_service.Repository.EmploeeRepository;
@@ -14,9 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.format.TextStyle;
-import java.util.List;
 import java.util.Locale;
 
 @Service
@@ -44,9 +43,6 @@ public class AttendenceRecordServiceImpl implements AttendenceRecordService {
 
 
         attendancerecord.setTodayDate(punchRequestDto.getTimeStamp().toLocalDate());
-
-
-
         String payMonth = attendancerecord.getTodayDate().getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         attendancerecord.setPayMonth(payMonth);
 
@@ -63,13 +59,17 @@ public class AttendenceRecordServiceImpl implements AttendenceRecordService {
         if (attendancerecord.getStartTime() != null && attendancerecord.getEndTime() != null) {
             Duration workDuration = Duration.between(attendancerecord.getStartTime(), attendancerecord.getEndTime());
             double workedHours = workDuration.toMinutes() / 60.0;
-            log.info(workDuration+"");
+            attendancerecord.setAttendenceStatus(AttendenceStatus.PRESENT);
             if (workedHours > 9) {
                 double overtime = workedHours - 9;
                 attendancerecord.setOvertimeHours(overtime);
             } else {
                 attendancerecord.setOvertimeHours(0.0);
             }
+        }
+        else if(attendancerecord.getStartTime() == null || attendancerecord.getEndTime() ==null)
+        {
+            attendancerecord.setAttendenceStatus(AttendenceStatus.ABSENT);
         }
 
         attendenceRepository.save(attendancerecord);
