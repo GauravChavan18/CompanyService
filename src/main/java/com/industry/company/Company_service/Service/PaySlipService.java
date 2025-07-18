@@ -11,7 +11,6 @@ public interface PaySlipService {
 
     PaySlip CreatePaySlipByMonth(Long id , String Month ,Earnings earnings);
 
-    void getPayslipPdf(Long id, OutputStream outputStream);
 
     void getPaySlipPdfByEmployeeIdAndMonth(Long id , String PayMonth , OutputStream outputStream);
 }

@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -21,17 +20,6 @@ public class PaySlipController {
 
     private final PaySlipService paySlipService;
 
-    @GetMapping("/{id}/pdf")
-    public void getPayslipPdf(@PathVariable Long id, HttpServletResponse response) {
-        response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition", "attachment; filename=payslip_" + id + ".pdf");
-
-        try (OutputStream outputStream = response.getOutputStream()) {
-            paySlipService.getPayslipPdf(id, outputStream);
-        } catch (IOException e) {
-            throw new RuntimeException("Error writing PDF to response", e);
-        }
-    }
 
     @GetMapping("/{id}/{PayMonth}/pdf")
     public void getPaySlipPdfByEmployeeIdAndMonth(@PathVariable Long id , @PathVariable String PayMonth , HttpServletResponse response)
