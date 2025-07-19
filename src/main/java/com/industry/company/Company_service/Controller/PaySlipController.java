@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 
 @RestController
 @RequestMapping("/payslip")
@@ -46,5 +47,14 @@ public class PaySlipController {
     {
         PaySlip paySlip=paySlipService.CreatePaySlipByMonth(id,PayMonth,earnings);
         return new ResponseEntity<>(paySlip, HttpStatus.CREATED);
+    }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<List<PaySlip>> getAllPlayslipsByEmployeeeId(@PathVariable long id)
+    {
+        List<PaySlip> paySlipList = paySlipService.getAllPlayslipsByEmployeeeId(id);
+
+        return new ResponseEntity<>(paySlipList , HttpStatus.FOUND);
     }
 }
