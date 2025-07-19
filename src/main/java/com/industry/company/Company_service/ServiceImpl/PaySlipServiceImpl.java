@@ -137,6 +137,17 @@ public class PaySlipServiceImpl implements PaySlipService {
         return paySlip;
     }
 
+    @Override
+    public List<PaySlip> getAllPlayslipsByEmployeeeId(Long employeeId) {
+        EmployeeEntity employee = emploeeRepository.findById(employeeId)
+                .orElseThrow(()->new ResourceNotFoundException("Employee not found"));
+
+        List<PaySlip> paySlipList = paySlipRepository.findByEmployeeEmployeeId(employeeId);
+
+        return paySlipList;
+
+    }
+
 
     public Earnings EarningsCalculation(Earnings earnings , List<AttendanceRecord> records , String PayMonth)
     {
