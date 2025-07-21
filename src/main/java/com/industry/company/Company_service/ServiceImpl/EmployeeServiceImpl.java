@@ -1,5 +1,6 @@
 package com.industry.company.Company_service.ServiceImpl;
 
+import com.industry.company.Company_service.Dto.CompanyDto;
 import com.industry.company.Company_service.Dto.EmployeeDto;
 import com.industry.company.Company_service.Entity.CompanyEntity;
 import com.industry.company.Company_service.Entity.EmployeeEntity;
@@ -61,4 +62,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         return employeeDtos;
     }
+
+
 }
