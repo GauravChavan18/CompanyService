@@ -10,6 +10,8 @@ import com.industry.company.Company_service.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class LeaveServiceImpl implements LeaveService {
@@ -32,4 +34,27 @@ public class LeaveServiceImpl implements LeaveService {
 
         return leaveRequest;
     }
+
+    @Override
+    public List<LeaveRequest> GetLeaveRequest(Long employeeId) {
+
+        EmployeeEntity employee = emploeeRepository
+                .findById(employeeId)
+                .orElseThrow(()-> new ResourceNotFoundException("Employee Not Found"));
+
+
+        List<LeaveRequest> leaveRequests =
+                leaveRepository
+                        .findAllByEmployeeEmployeeId(employeeId);
+
+        if (leaveRequests.isEmpty()) {
+            throw new ResourceNotFoundException("Leave Not Found for this Employee");
+        }
+
+        return  leaveRequests;
+
+
+    }
+
+
 }

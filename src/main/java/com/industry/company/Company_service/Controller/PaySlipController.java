@@ -4,10 +4,12 @@ package com.industry.company.Company_service.Controller;
 import com.industry.company.Company_service.Entity.Earnings;
 import com.industry.company.Company_service.Entity.PaySlip;
 import com.industry.company.Company_service.Service.PaySlipService;
+import com.industry.company.Company_service.advice.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -51,10 +53,11 @@ public class PaySlipController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<PaySlip>> getAllPlayslipsByEmployeeeId(@PathVariable long id)
+    public ApiResponse getAllPlayslipsByEmployeeeId(@PathVariable long id , Model model)
     {
         List<PaySlip> paySlipList = paySlipService.getAllPlayslipsByEmployeeeId(id);
-
-        return new ResponseEntity<>(paySlipList , HttpStatus.FOUND);
+        model.addAttribute("payslipList", paySlipList);
+        return new ApiResponse(true, "Payslips fetched", paySlipList);
+       // return new ResponseEntity<>(paySlipList , HttpStatus.FOUND);
     }
 }

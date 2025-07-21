@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/leaverequest")
 @RequiredArgsConstructor
@@ -22,4 +24,14 @@ public class LeaveRequestController {
 
         return new ResponseEntity<>(leaveRequest1 , HttpStatus.CREATED);
     }
+
+    @GetMapping("/{employeeId}")
+    private ResponseEntity<List<LeaveRequest>> GetLeaveRequest(@PathVariable Long employeeId)
+    {
+        List<LeaveRequest> leaveRequests = leaveService.GetLeaveRequest(employeeId);
+
+        return new ResponseEntity<>(leaveRequests, HttpStatus.FOUND);
+    }
+
+
 }
