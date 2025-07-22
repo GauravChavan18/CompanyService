@@ -4,8 +4,10 @@ import com.industry.company.Company_service.Dto.PunchRequestDto;
 import com.industry.company.Company_service.Entity.AttendanceRecord;
 import com.industry.company.Company_service.Entity.AttendenceStatus;
 import com.industry.company.Company_service.Entity.EmployeeEntity;
+import com.industry.company.Company_service.Entity.LeaveRequest;
 import com.industry.company.Company_service.Repository.AttendenceRepository;
 import com.industry.company.Company_service.Repository.EmploeeRepository;
+import com.industry.company.Company_service.Repository.LeaveRepository;
 import com.industry.company.Company_service.Repository.PaySlipRepository;
 import com.industry.company.Company_service.Service.AttendenceRecordService;
 import com.industry.company.Company_service.exception.ResourceNotFoundException;
@@ -30,12 +32,15 @@ public class AttendenceRecordServiceImpl implements AttendenceRecordService {
 
     private final EmploeeRepository emploeeRepository;
 
+    private  final LeaveRepository leaveRepository;
 
     @Override
     public AttendanceRecord FillAttendenceForDay(PunchRequestDto punchRequestDto, Long employeeId) {
 
         EmployeeEntity employee = emploeeRepository.findById(employeeId)
                 .orElseThrow(()->new ResourceNotFoundException("Employee not found"));
+
+        List<LeaveRequest> leaveRequests = leaveRepository.findAllByEmployeeEmployeeId(employeeId);
 
         LocalDate todayDate =punchRequestDto.getTimeStamp().toLocalDate();
 
@@ -56,8 +61,21 @@ public class AttendenceRecordServiceImpl implements AttendenceRecordService {
             attendancerecord.setEndTime(punchRequestDto.getTimeStamp().toLocalTime());
         }
 
+        if(attendancerecord.getStartTime() == null && attendancerecord.getEndTime() == null)
+        {
+           Boolean hasLeave = leaveRequests.stream().anyMatch(
+                   leaveRequest ->
+                       !attendancerecord.getTodayDate().isBefore(leaveRequest.getLeaveStartDate()) && !attendancerecord.getTodayDate().isAfter(leaveRequest.getLeaveEndDate())
+                   );
 
-        if (attendancerecord.getStartTime() != null && attendancerecord.getEndTime() != null) {
+            if (hasLeave) {
+                attendancerecord.setAttendenceStatus(AttendenceStatus.LEAVE);
+            } else {
+                attendancerecord.setAttendenceStatus(AttendenceStatus.ABSENT);
+            }
+
+        }
+        else if (attendancerecord.getStartTime() != null && attendancerecord.getEndTime() != null) {
             Duration workDuration = Duration.between(attendancerecord.getStartTime(), attendancerecord.getEndTime());
             double workedHours = workDuration.toMinutes() / 60.0;
             attendancerecord.setAttendenceStatus(AttendenceStatus.PRESENT);

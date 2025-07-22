@@ -4,6 +4,7 @@ package com.industry.company.Company_service.Entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.CascadeType;
 
 import java.time.LocalDate;
 
@@ -28,4 +29,6 @@ public class LeaveRequest {
     @ManyToOne
     @JoinColumn(name = "employeeId", nullable = false)
     private EmployeeEntity employee;
+
+
 }
