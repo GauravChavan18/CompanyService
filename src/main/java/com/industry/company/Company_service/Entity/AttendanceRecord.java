@@ -30,4 +30,5 @@ public class AttendanceRecord {
     @ManyToOne
     @JoinColumn(name = "employeeId", nullable = false)
     private EmployeeEntity employee;
+
 }

@@ -3,6 +3,7 @@ package com.industry.company.Company_service.ServiceImpl;
 import com.industry.company.Company_service.Entity.*;
 import com.industry.company.Company_service.Repository.AttendenceRepository;
 import com.industry.company.Company_service.Repository.EmploeeRepository;
+import com.industry.company.Company_service.Repository.LeaveRepository;
 import com.industry.company.Company_service.Repository.PaySlipRepository;
 import com.industry.company.Company_service.Service.PaySlipService;
 import com.industry.company.Company_service.exception.ResourceNotFoundException;
@@ -32,7 +33,7 @@ public class PaySlipServiceImpl implements PaySlipService {
 
     private final AttendenceRepository attendenceRepository;
 
-
+    private final LeaveRepository leaveRepository;
 
     @Override
     public void getPaySlipPdfByEmployeeIdAndMonth(Long id, String PayMonth, OutputStream outputStream) {
@@ -104,38 +105,54 @@ public class PaySlipServiceImpl implements PaySlipService {
     @Override
     public PaySlip CreatePaySlipByMonth(Long employeeId, String PayMonth, Earnings earnings) {
         EmployeeEntity employee = emploeeRepository.findById(employeeId)
-                .orElseThrow(()->new ResourceNotFoundException("Employee not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
 
 
-        LocalDate StartDate = LocalDate.of(LocalDate.now().getYear(), java.time.Month.valueOf(PayMonth.toUpperCase()),1);
+        LocalDate StartDate = LocalDate.of(LocalDate.now().getYear(), java.time.Month.valueOf(PayMonth.toUpperCase()), 1);
         LocalDate EndDate = StartDate.withDayOfMonth(StartDate.lengthOfMonth());
-        List<AttendanceRecord> records =attendenceRepository.findByEmployeeIdAndTodayDateBetween(employeeId,StartDate,EndDate);
 
-        Earnings earningsTemp = EarningsCalculation(earnings , records ,PayMonth);
+        for (LocalDate date = StartDate; !date.isAfter(EndDate); date = date.plusDays(1)) {
+
+            boolean exists = attendenceRepository
+                    .findByEmployeeEmployeeIdAndTodayDate(employeeId, date)
+                    .isPresent();
+
+            if (!exists) {
+                AttendanceRecord record = new AttendanceRecord();
+                record.setEmployee(employee);
+                record.setTodayDate(date);
+                record.setPayMonth(PayMonth);
+                record.setAttendenceStatus(AttendenceStatus.LEAVE);
+                attendenceRepository.save(record);
+            }
+        }
+            List<AttendanceRecord> records = attendenceRepository.findByEmployeeIdAndTodayDateBetween(employeeId, StartDate, EndDate);
+
+            Earnings earningsTemp = EarningsCalculation(earnings, records, PayMonth);
 
 
-        TotalDeductions deductions = new TotalDeductions();
-        deductions.setPfDeducted(1500);
-        deductions.setProfTax(250);
-        deductions.setAwtDeduction(5);
-        deductions.calculateTotals();
+            TotalDeductions deductions = new TotalDeductions();
+            deductions.setPfDeducted(1500);
+            deductions.setProfTax(250);
+            deductions.setAwtDeduction(5);
+            deductions.calculateTotals();
 
-        earningsTemp.setGrossEarnings(earningsTemp.getGrossEarnings()-deductions.getTotalDeductions());
+            earningsTemp.setGrossEarnings(earningsTemp.getGrossEarnings() - deductions.getTotalDeductions());
 
 
+            PaySlip paySlip = paySlipRepository
+                    .findByEmployeeEmployeeIdAndEarnings_PayMonth(employeeId, PayMonth)
+                    .orElse(new PaySlip());
 
-        PaySlip paySlip= paySlipRepository
-                .findByEmployeeEmployeeIdAndEarnings_PayMonth(employeeId,PayMonth)
-                .orElse(new PaySlip());
+            paySlip.setEmployee(employee);
+            paySlip.setEarnings(earningsTemp);
+            paySlip.setTotalDeductions(deductions);
 
-        paySlip.setEmployee(employee);
-        paySlip.setEarnings(earningsTemp);
-        paySlip.setTotalDeductions(deductions);
+            paySlipRepository.save(paySlip);
 
-        paySlipRepository.save(paySlip);
+            return paySlip;
+        }
 
-        return paySlip;
-    }
 
     @Override
     public List<PaySlip> getAllPlayslipsByEmployeeeId(Long employeeId) {
@@ -148,8 +165,7 @@ public class PaySlipServiceImpl implements PaySlipService {
 
     }
 
-
-    public Earnings EarningsCalculation(Earnings earnings , List<AttendanceRecord> records , String PayMonth)
+    public Earnings EarningsCalculation(Earnings earnings , List<AttendanceRecord> records , String PayMonth )
     {
         double overtimeHrs =2.5;
         double overtimePay = overtimeHrs *100;
@@ -177,10 +193,13 @@ public class PaySlipServiceImpl implements PaySlipService {
 
     }
 
-    public Long findTheDaysPayable(List<AttendanceRecord> records)
+    public Long findTheDaysPayable(List<AttendanceRecord> records )
     {
+
+
         return records.stream()
-                .filter((record) -> record.getAttendenceStatus().equals(AttendenceStatus.PRESENT)).count();
+                .filter((record) ->
+                        record.getAttendenceStatus().equals(AttendenceStatus.PRESENT) || record.getAttendenceStatus().equals(AttendenceStatus.LEAVE)).count();
 
     }
 }
