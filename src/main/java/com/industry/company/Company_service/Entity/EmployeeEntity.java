@@ -54,4 +54,8 @@ public class EmployeeEntity {
     @JsonIgnore
     private List<LeaveRequest> leaveRequestList;
 
+    @OneToOne(mappedBy = "employee")
+    @JsonIgnore
+    private LeaveBalanceEntity leaveBalanceEntity;
+
 }

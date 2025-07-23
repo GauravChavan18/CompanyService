@@ -5,6 +5,7 @@ import com.industry.company.Company_service.Repository.AttendenceRepository;
 import com.industry.company.Company_service.Repository.EmploeeRepository;
 import com.industry.company.Company_service.Repository.LeaveRepository;
 import com.industry.company.Company_service.Repository.PaySlipRepository;
+import com.industry.company.Company_service.Service.LeaveService;
 import com.industry.company.Company_service.Service.PaySlipService;
 import com.industry.company.Company_service.exception.ResourceNotFoundException;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
@@ -34,6 +35,8 @@ public class PaySlipServiceImpl implements PaySlipService {
     private final AttendenceRepository attendenceRepository;
 
     private final LeaveRepository leaveRepository;
+
+    private final LeaveService leaveService;
 
     @Override
     public void getPaySlipPdfByEmployeeIdAndMonth(Long id, String PayMonth, OutputStream outputStream) {
@@ -111,6 +114,9 @@ public class PaySlipServiceImpl implements PaySlipService {
         LocalDate StartDate = LocalDate.of(LocalDate.now().getYear(), java.time.Month.valueOf(PayMonth.toUpperCase()), 1);
         LocalDate EndDate = StartDate.withDayOfMonth(StartDate.lengthOfMonth());
 
+
+
+
         for (LocalDate date = StartDate; !date.isAfter(EndDate); date = date.plusDays(1)) {
 
             boolean exists = attendenceRepository
@@ -127,7 +133,7 @@ public class PaySlipServiceImpl implements PaySlipService {
             }
         }
             List<AttendanceRecord> records = attendenceRepository.findByEmployeeIdAndTodayDateBetween(employeeId, StartDate, EndDate);
-
+            leaveService.UpdateLeaveRequestStatus(employeeId);
             Earnings earningsTemp = EarningsCalculation(earnings, records, PayMonth);
 
 

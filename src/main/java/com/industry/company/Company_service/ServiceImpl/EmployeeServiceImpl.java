@@ -4,8 +4,11 @@ import com.industry.company.Company_service.Dto.CompanyDto;
 import com.industry.company.Company_service.Dto.EmployeeDto;
 import com.industry.company.Company_service.Entity.CompanyEntity;
 import com.industry.company.Company_service.Entity.EmployeeEntity;
+import com.industry.company.Company_service.Entity.LeaveBalanceEntity;
 import com.industry.company.Company_service.Repository.CompanyRepository;
 import com.industry.company.Company_service.Repository.EmploeeRepository;
+import com.industry.company.Company_service.Repository.LeaveBalanceRepository;
+import com.industry.company.Company_service.Repository.LeaveRepository;
 import com.industry.company.Company_service.Service.EmployeeService;
 import com.industry.company.Company_service.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private final CompanyRepository companyRepository;
 
+    private final LeaveBalanceRepository leaveBalanceRepository;
     private final ModelMapper modelMapper;
 
     @Override
@@ -38,10 +42,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         CompanyEntity company = companyRepository.findByCompanyName(companyName)
                         .orElseThrow(()-> new ResourceNotFoundException("Company not found"));
 
+        LeaveBalanceEntity leaveBalanceEntity = new LeaveBalanceEntity();
+        leaveBalanceEntity.setLeaveBalace(24L);
+        leaveBalanceEntity.setEmployee(employee);
+
         employee.setCompany(company);
 
         emploeeRepository.save(employee);
-
+        leaveBalanceRepository.save(leaveBalanceEntity);
 
         return modelMapper.map(employee,EmployeeDto.class);
     }
