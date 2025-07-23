@@ -10,5 +10,5 @@ public interface LeaveService {
 
     List<LeaveRequest> GetLeaveRequest(Long employeeId);
 
-
+    void UpdateLeaveRequestStatus(Long employeeId);
 }
