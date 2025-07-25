@@ -33,4 +33,13 @@ public class AttendenceRecordController {
 
         return new ResponseEntity<>(attendancerecord, HttpStatus.CREATED);
     }
+
+
+    @GetMapping("/{id}/{payMonth}")
+    public ResponseEntity<List<AttendanceRecord>> GetAttendenceByEmployeeForMonth(@PathVariable Long id , @PathVariable String payMonth)
+    {
+        List<AttendanceRecord> attendanceRecordList = attendenceRecordService.GetAttendenceByEmployeeForMonth(id,payMonth);
+
+        return new ResponseEntity<>(attendanceRecordList , HttpStatus.FOUND);
+    }
 }

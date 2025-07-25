@@ -101,4 +101,16 @@ public class AttendenceRecordServiceImpl implements AttendenceRecordService {
        return punchRequestDtos.stream().map((punchRequestDto -> FillAttendenceForDay(punchRequestDto, employeeId))).toList();
 
     }
+
+    @Override
+    public List<AttendanceRecord> GetAttendenceByEmployeeForMonth(Long employeeId , String payMonth) {
+
+        EmployeeEntity employee = emploeeRepository.findById(employeeId)
+                .orElseThrow(()->new ResourceNotFoundException("Employee not found"));
+
+        List<AttendanceRecord> attendanceRecordList = attendenceRepository.findByEmployeeEmployeeIdAndPayMonth(employeeId ,payMonth);
+
+
+        return attendanceRecordList;
+    }
 }
