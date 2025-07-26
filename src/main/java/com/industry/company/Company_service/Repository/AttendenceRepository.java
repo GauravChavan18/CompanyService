@@ -32,4 +32,6 @@ public interface AttendenceRepository extends JpaRepository<AttendanceRecord, Lo
 
 
     Optional<AttendanceRecord> findByEmployeeEmployeeIdAndTodayDate(Long employeeId , LocalDate todayDate);
+
+    List<AttendanceRecord> findByEmployeeEmployeeIdAndPayMonth(Long employeeId, String payMonth);
 }
