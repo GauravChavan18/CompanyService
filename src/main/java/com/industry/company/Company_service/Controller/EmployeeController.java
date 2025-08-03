@@ -5,6 +5,8 @@ import com.industry.company.Company_service.Service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/employee")
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class EmployeeController {
 
     private final EmployeeService employeeService;
@@ -25,6 +28,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/{companyName}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<EmployeeDto>> GetEmployeesByCompanyName(@PathVariable String companyName)
     {
         return new ResponseEntity<>(employeeService.GetEmployeesByCompanyName(companyName), HttpStatus.FOUND);

@@ -12,6 +12,8 @@ public class EmployeeDto {
 
     private String employeeName;
 
+    private String email;
+
     private String pan;
 
     private String pfNumber;

@@ -1,6 +1,7 @@
 package com.industry.company.Company_service.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.industry.company.Company_service.AuthEntity.EmployeeAuthEntity;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -20,6 +21,8 @@ public class EmployeeEntity {
     private Long employeeId;
 
     private String employeeName;
+
+    private String email;
 
     private String pan;
 
@@ -58,4 +61,7 @@ public class EmployeeEntity {
     @JsonIgnore
     private LeaveBalanceEntity leaveBalanceEntity;
 
+    @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private EmployeeAuthEntity userAuth;
 }
