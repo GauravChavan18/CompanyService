@@ -132,6 +132,8 @@ public class PaySlipServiceImpl implements PaySlipService {
                 attendenceRepository.save(record);
             }
         }
+
+
             List<AttendanceRecord> records = attendenceRepository.findByEmployeeIdAndTodayDateBetween(employeeId, StartDate, EndDate);
             leaveService.UpdateLeaveRequestStatus(employeeId);
             Earnings earningsTemp = EarningsCalculation(earnings, records, PayMonth);

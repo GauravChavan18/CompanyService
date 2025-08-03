@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,11 +21,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/payslip")
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class PaySlipController {
 
     private final PaySlipService paySlipService;
 
-
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/{id}/{PayMonth}/pdf")
     public void getPaySlipPdfByEmployeeIdAndMonth(@PathVariable Long id , @PathVariable String PayMonth , HttpServletResponse response)
     {

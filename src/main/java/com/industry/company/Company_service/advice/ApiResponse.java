@@ -15,7 +15,7 @@ public class ApiResponse<T> {
         this.timeStamp = LocalDateTime.now();
     }
 
-    public ApiResponse(T data) {
+    public ApiResponse(boolean b, String payslipsFetched, T data) {
         this();
         this.data = data;
     }
@@ -24,4 +24,6 @@ public class ApiResponse<T> {
         this();
         this.error = error;
     }
+
+
 }
