@@ -1,5 +1,6 @@
 package com.industry.company.Company_service.ServiceImpl;
 
+import com.industry.company.Company_service.AuthEntity.AdminEntity;
 import com.industry.company.Company_service.AuthEntity.AuthStatus;
 import com.industry.company.Company_service.AuthEntity.EmployeeAuthEntity;
 import com.industry.company.Company_service.AuthEntity.Roles;
@@ -26,19 +27,18 @@ import java.util.Locale;
 @Slf4j
 public class EmployeeServiceImpl implements EmployeeService {
 
-    private final EmploeeRepository emploeeRepository;
-
-    private final CompanyRepository companyRepository;
-
-    private final LeaveBalanceRepository leaveBalanceRepository;
     private final ModelMapper modelMapper;
-
-    private final EmployeeAuthEntityRepo employeeAuthEntityRepo;
-
     private final PasswordEncoder passwordEncoder;
 
+    private final EmploeeRepository emploeeRepository;
+    private final CompanyRepository companyRepository;
+    private final AdminRepository adminRepository;
+    private final LeaveBalanceRepository leaveBalanceRepository;
+    private final EmployeeAuthEntityRepo employeeAuthEntityRepo;
+
+
     @Override
-    public EmployeeDto AddEmployee(EmployeeDto employeeDto) {
+    public EmployeeDto AddEmployee(EmployeeDto employeeDto , String admin) {
 
         EmployeeEntity employee = modelMapper.map(employeeDto,EmployeeEntity.class);
 
@@ -47,11 +47,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         CompanyEntity company = companyRepository.findByCompanyName(companyName)
                         .orElseThrow(()-> new ResourceNotFoundException("Company not found"));
 
+        AdminEntity adminEntity = adminRepository.findById(admin).orElseThrow(()-> new ResourceNotFoundException("Admin is not assigned"));
+
         LeaveBalanceEntity leaveBalanceEntity = new LeaveBalanceEntity();
         leaveBalanceEntity.setLeaveBalace(24L);
         leaveBalanceEntity.setEmployee(employee);
 
         employee.setCompany(company);
+        employee.setAdminEntity(adminEntity);
 
         emploeeRepository.save(employee);
 
