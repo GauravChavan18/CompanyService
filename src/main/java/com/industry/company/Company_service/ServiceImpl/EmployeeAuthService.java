@@ -29,6 +29,7 @@ public class EmployeeAuthService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        log.info("fetching employee");
         return employeeAuthEntityRepo.findById(email).orElseThrow(()-> new ResourceNotFoundException("user not found"));
 
     }
@@ -44,7 +45,7 @@ public class EmployeeAuthService implements UserDetailsService {
 //        log.info("employee auth {}",employeeauth);
         Boolean matches = passwordEncoder.matches(password ,employeeauth.getPassword());
 
-        log.info("Mqatches :{}",matches);
+        log.info("Matches :{}",matches);
         if(username.equals(employeeauth.getUsername()) && matches)
         {
             employeeauth.setPassword(passwordEncoder.encode(newPassword));
@@ -55,5 +56,12 @@ public class EmployeeAuthService implements UserDetailsService {
             return new ResponseEntity<>("Details Mismatched" ,HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(employeeauth , HttpStatus.CREATED);
+    }
+
+    public void updatePassword(String username, String newPassword) {
+        EmployeeAuthEntity entity = employeeAuthEntityRepo.findById(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Not found"));
+        entity.setPassword(passwordEncoder.encode(newPassword));
+        employeeAuthEntityRepo.save(entity);
     }
 }

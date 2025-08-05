@@ -41,6 +41,7 @@ public class PaySlipController {
     }
 
     @PostMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PaySlip> CreatePaySlip(@PathVariable long id , @RequestBody Earnings earnings)
     {
         PaySlip paySlip =paySlipService.CreatePaySlip(id ,earnings);
@@ -48,6 +49,7 @@ public class PaySlipController {
     }
 
     @PostMapping("/{id}/{PayMonth}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PaySlip> CreatePaySlipByMonth(@PathVariable long id , @PathVariable String PayMonth , @RequestBody Earnings earnings)
     {
         PaySlip paySlip=paySlipService.CreatePaySlipByMonth(id,PayMonth,earnings);
@@ -56,6 +58,7 @@ public class PaySlipController {
 
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ApiResponse getAllPlayslipsByEmployeeeId(@PathVariable long id , Model model)
     {
         List<PaySlip> paySlipList = paySlipService.getAllPlayslipsByEmployeeeId(id);

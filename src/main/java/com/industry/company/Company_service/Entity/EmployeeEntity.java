@@ -1,6 +1,7 @@
 package com.industry.company.Company_service.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.industry.company.Company_service.AuthEntity.AdminEntity;
 import com.industry.company.Company_service.AuthEntity.EmployeeAuthEntity;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
@@ -60,6 +61,10 @@ public class EmployeeEntity {
     @OneToOne(mappedBy = "employee")
     @JsonIgnore
     private LeaveBalanceEntity leaveBalanceEntity;
+
+    @ManyToOne
+    @JoinColumn(name = "admin" ,nullable = false)
+    private AdminEntity adminEntity;
 
     @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL)
     @JsonIgnore

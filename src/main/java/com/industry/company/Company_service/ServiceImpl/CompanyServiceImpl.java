@@ -24,7 +24,7 @@ public class CompanyServiceImpl implements CompanyService {
 
         CompanyEntity company = modelMapper.map(companyDto , CompanyEntity.class);
 
-//        companyRepository.findByCompanyName(company.getCompanyName()).stream().toList().size()==1
+
         if(companyRepository.findAll().stream().toList().size()==0)
         {
             companyRepository.save(company);

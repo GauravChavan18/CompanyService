@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface EmployeeService {
 
-    EmployeeDto AddEmployee(EmployeeDto employeeDto);
+    EmployeeDto AddEmployee(EmployeeDto employeeDto , String admin);
 
     List<EmployeeDto> GetEmployeesByCompanyName(String companyName);
 

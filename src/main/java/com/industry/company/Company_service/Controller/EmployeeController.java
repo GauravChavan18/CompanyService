@@ -19,16 +19,16 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
 
-    @PostMapping
-    public ResponseEntity<EmployeeDto> AddEmployee(@RequestBody EmployeeDto employeeDto)
+    @PostMapping("/{admin}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<EmployeeDto> AddEmployee(@RequestBody EmployeeDto employeeDto , @PathVariable String admin)
     {
-        EmployeeDto employeedto = employeeService.AddEmployee(employeeDto);
-
+        EmployeeDto employeedto = employeeService.AddEmployee(employeeDto , admin);
         return new ResponseEntity<>(employeedto , HttpStatus.CREATED);
     }
 
     @GetMapping("/{companyName}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<EmployeeDto>> GetEmployeesByCompanyName(@PathVariable String companyName)
     {
         return new ResponseEntity<>(employeeService.GetEmployeesByCompanyName(companyName), HttpStatus.FOUND);

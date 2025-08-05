@@ -1,26 +1,22 @@
 package com.industry.company.Company_service.Controller;
 
 
-import com.industry.company.Company_service.AuthEntity.AuthStatus;
-import com.industry.company.Company_service.AuthEntity.EmployeeAuthEntity;
+
 import com.industry.company.Company_service.AuthEntity.JWTUtil;
 import com.industry.company.Company_service.AuthEntity.loginRequest;
-import com.industry.company.Company_service.Entity.EmployeeEntity;
 import com.industry.company.Company_service.Repository.EmployeeAuthEntityRepo;
+import com.industry.company.Company_service.ServiceImpl.CompositeUserDetailsService;
 import com.industry.company.Company_service.ServiceImpl.EmployeeAuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,11 +26,12 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+
 public class LoginController {
 
     private final AuthenticationManager authenticationManager;
 
-    private final UserDetailsService userDetailsService;
+    private final CompositeUserDetailsService userDetailsService;
 
     private final JWTUtil jwtUtil;
 
@@ -42,7 +39,7 @@ public class LoginController {
 
     private final EmployeeAuthEntityRepo employeeAuthEntityRepo;
 
-    private final PasswordEncoder passwordEncoder;
+    private final CompositeUserDetailsService compositeUserDetailsService;
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody loginRequest loginrequest) {
@@ -58,6 +55,7 @@ public class LoginController {
         if (auth.isAuthenticated()) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
+//            System.out.println(userDetails);
             List<String> roles = auth.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .toList();
@@ -73,8 +71,8 @@ public class LoginController {
     @PostMapping("/forgotPassword")
     public ResponseEntity<?> forgetPassword(@RequestBody loginRequest loginrequest)
     {
-        ResponseEntity<?> employeeAuthEntity1 =employeeAuthService.forgetPassword(loginrequest);
-        return new ResponseEntity<>(employeeAuthEntity1 , HttpStatus.CREATED);
+        ResponseEntity<?> authEntity =compositeUserDetailsService.forgetPassword(loginrequest);
+        return new ResponseEntity<>(authEntity, HttpStatus.CREATED);
 
     }
 

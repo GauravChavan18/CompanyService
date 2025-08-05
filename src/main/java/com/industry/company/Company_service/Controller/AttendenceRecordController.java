@@ -6,6 +6,8 @@ import com.industry.company.Company_service.Service.AttendenceRecordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,11 +15,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/records")
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class AttendenceRecordController {
 
     private  final AttendenceRecordService attendenceRecordService;
 
     @PostMapping("/{id}/{PayMonth}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AttendanceRecord> FillAttendenceForDay(@RequestBody PunchRequestDto punchRequestDto, @PathVariable Long id )
     {
         AttendanceRecord attendancerecord = attendenceRecordService.FillAttendenceForDay(punchRequestDto,id);
@@ -27,6 +31,7 @@ public class AttendenceRecordController {
 
 
     @PostMapping("/{id}/month/{PayMonth}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<AttendanceRecord>> FillAttendenceForMonth(@RequestBody List<PunchRequestDto> punchRequestDto, @PathVariable Long id )
     {
         List<AttendanceRecord> attendancerecord = attendenceRecordService.FillAttendenceForMonth(punchRequestDto,id);
@@ -36,6 +41,7 @@ public class AttendenceRecordController {
 
 
     @GetMapping("/{id}/{payMonth}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<AttendanceRecord>> GetAttendenceByEmployeeForMonth(@PathVariable Long id , @PathVariable String payMonth)
     {
         List<AttendanceRecord> attendanceRecordList = attendenceRecordService.GetAttendenceByEmployeeForMonth(id,payMonth);
