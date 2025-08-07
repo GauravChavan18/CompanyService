@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -19,11 +20,11 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
 
-    @PostMapping("/{admin}")
+    @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<EmployeeDto> AddEmployee(@RequestBody EmployeeDto employeeDto , @PathVariable String admin)
+    public ResponseEntity<EmployeeDto> AddEmployee(@RequestBody EmployeeDto employeeDto , Principal principal)
     {
-        EmployeeDto employeedto = employeeService.AddEmployee(employeeDto , admin);
+        EmployeeDto employeedto = employeeService.AddEmployee(employeeDto , principal.getName());
         return new ResponseEntity<>(employeedto , HttpStatus.CREATED);
     }
 
@@ -34,4 +35,11 @@ public class EmployeeController {
         return new ResponseEntity<>(employeeService.GetEmployeesByCompanyName(companyName), HttpStatus.FOUND);
     }
 
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<EmployeeDto>> GetEmployeesByAdminName(Principal principal)
+    {
+
+        return new ResponseEntity<>(employeeService.GetEmployeesByAdminName(principal.getName()), HttpStatus.FOUND);
+    }
 }

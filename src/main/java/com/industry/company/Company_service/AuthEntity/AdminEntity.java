@@ -17,7 +17,7 @@ import java.util.List;
 public class AdminEntity implements UserDetails {
 
     @Id
-    private String email;
+    private String adminEmail;
 
     private String Password;
 
@@ -39,7 +39,7 @@ public class AdminEntity implements UserDetails {
     @Override
     public String toString() {
         return "AdminEntity{" +
-                "email='" + email + '\'' +
+                "email='" + adminEmail + '\'' +
                 ", Password='" + Password + '\'' +
                 ", role=" + role +
                 ", company=" + company +
@@ -48,6 +48,6 @@ public class AdminEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.email;
+        return this.adminEmail;
     }
 }
