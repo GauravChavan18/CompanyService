@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -32,9 +33,9 @@ public class AttendenceRecordController {
 
     @PostMapping("/{id}/month/{PayMonth}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<AttendanceRecord>> FillAttendenceForMonth(@RequestBody List<PunchRequestDto> punchRequestDto, @PathVariable Long id )
+    public ResponseEntity<List<AttendanceRecord>> FillAttendenceForMonth(@RequestBody List<PunchRequestDto> punchRequestDto, @PathVariable Long id ,Principal principal)
     {
-        List<AttendanceRecord> attendancerecord = attendenceRecordService.FillAttendenceForMonth(punchRequestDto,id);
+        List<AttendanceRecord> attendancerecord = attendenceRecordService.FillAttendenceForMonth(punchRequestDto,id , principal.getName());
 
         return new ResponseEntity<>(attendancerecord, HttpStatus.CREATED);
     }
@@ -42,9 +43,9 @@ public class AttendenceRecordController {
 
     @GetMapping("/{id}/{payMonth}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<AttendanceRecord>> GetAttendenceByEmployeeForMonth(@PathVariable Long id , @PathVariable String payMonth)
+    public ResponseEntity<List<AttendanceRecord>> GetAttendenceByEmployeeForMonth(@PathVariable Long id , @PathVariable String payMonth ,Principal principal)
     {
-        List<AttendanceRecord> attendanceRecordList = attendenceRecordService.GetAttendenceByEmployeeForMonth(id,payMonth);
+        List<AttendanceRecord> attendanceRecordList = attendenceRecordService.GetAttendenceByEmployeeForMonth(id,payMonth,principal.getName());
 
         return new ResponseEntity<>(attendanceRecordList , HttpStatus.FOUND);
     }

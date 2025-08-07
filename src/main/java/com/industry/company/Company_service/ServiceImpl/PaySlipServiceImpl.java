@@ -1,16 +1,16 @@
 package com.industry.company.Company_service.ServiceImpl;
 
+import com.industry.company.Company_service.AuthEntity.AdminEntity;
+import com.industry.company.Company_service.AuthEntity.EmployeeAuthEntity;
 import com.industry.company.Company_service.Entity.*;
-import com.industry.company.Company_service.Repository.AttendenceRepository;
-import com.industry.company.Company_service.Repository.EmploeeRepository;
-import com.industry.company.Company_service.Repository.LeaveRepository;
-import com.industry.company.Company_service.Repository.PaySlipRepository;
+import com.industry.company.Company_service.Repository.*;
 import com.industry.company.Company_service.Service.LeaveService;
 import com.industry.company.Company_service.Service.PaySlipService;
 import com.industry.company.Company_service.exception.ResourceNotFoundException;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -36,12 +36,31 @@ public class PaySlipServiceImpl implements PaySlipService {
 
     private final LeaveRepository leaveRepository;
 
+    private final AdminRepository adminRepository;
+
     private final LeaveService leaveService;
 
+    private final EmployeeAuthEntityRepo employeeAuthEntityRepo;
+
     @Override
-    public void getPaySlipPdfByEmployeeIdAndMonth(Long id, String PayMonth, OutputStream outputStream) {
+    public void getPaySlipPdfByEmployeeIdAndMonth(Long id, String PayMonth, OutputStream outputStream , String email) {
         PaySlip paySlip = paySlipRepository.findByEmployeeEmployeeIdAndEarnings_PayMonth(id,PayMonth)
                 .orElseThrow(()-> new ResourceNotFoundException("PaySlip not found "));
+
+
+        boolean exists = adminRepository.findById(email).isPresent() || paySlipRepository.findByEmployeeEmployeeIdAndEarnings_PayMonth(id,PayMonth).isPresent();
+
+        if(!exists)
+        {
+            log.info("JWT Passing Email : {}", email);
+            log.info("employee email from PaySlip : {}", paySlip.getEmployee().getEmail());
+            throw new AccessDeniedException("You are not authorized");
+        }
+
+
+
+
+
 
         Context context = new Context();
         context.setVariable("data", paySlip);
@@ -61,10 +80,18 @@ public class PaySlipServiceImpl implements PaySlipService {
     }
 
     @Override
-    public PaySlip CreatePaySlip(Long id , Earnings earnings) {
+    public PaySlip CreatePaySlip(Long id , Earnings earnings , String email) {
         EmployeeEntity employee = emploeeRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Employee not found"));
 
+        if(!employee.getAdminEntity().getAdminEmail().equals(email))
+        {
+
+            throw new AccessDeniedException("You are not authorized");
+        }
+
+        log.info("JWT Passing Email : {}", email);
+        log.info("employee email from PaySlip : {}", employee.getAdminEntity().getAdminEmail());
 
         PaySlip paySlip=new PaySlip();
         paySlip.setEmployee(employee);
@@ -106,9 +133,17 @@ public class PaySlipServiceImpl implements PaySlipService {
     }
 
     @Override
-    public PaySlip CreatePaySlipByMonth(Long employeeId, String PayMonth, Earnings earnings) {
+    public PaySlip CreatePaySlipByMonth(Long employeeId, String PayMonth, Earnings earnings , String email) {
         EmployeeEntity employee = emploeeRepository.findById(employeeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
+
+        if(!employee.getAdminEntity().getAdminEmail().equals(email))
+        {
+            log.info("JWT Passing Email : {}", email);
+            log.info("employee email from PaySlip : {}", employee.getAdminEntity().getAdminEmail());
+            throw new AccessDeniedException("You are not authorized");
+        }
+
 
 
         LocalDate StartDate = LocalDate.of(LocalDate.now().getYear(), java.time.Month.valueOf(PayMonth.toUpperCase()), 1);
@@ -163,10 +198,15 @@ public class PaySlipServiceImpl implements PaySlipService {
 
 
     @Override
-    public List<PaySlip> getAllPlayslipsByEmployeeeId(Long employeeId) {
-        EmployeeEntity employee = emploeeRepository.findById(employeeId)
-                .orElseThrow(()->new ResourceNotFoundException("Employee not found"));
+    public List<PaySlip> getAllPlayslipsByEmployeeeId(Long employeeId , String email) {
 
+        boolean exists = adminRepository.findById(email).isPresent() || emploeeRepository.findByAdminEntityAdminEmail(email).isEmpty();
+
+        if(!exists)
+        {
+            log.info("JWT Passing Email : {}", email);
+            throw new AccessDeniedException("You are not authorized");
+        }
         List<PaySlip> paySlipList = paySlipRepository.findByEmployeeEmployeeId(employeeId);
 
         return paySlipList;

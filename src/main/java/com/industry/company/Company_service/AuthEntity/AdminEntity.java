@@ -1,6 +1,7 @@
 package com.industry.company.Company_service.AuthEntity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.industry.company.Company_service.Entity.CompanyEntity;
 import com.industry.company.Company_service.Entity.EmployeeEntity;
 import jakarta.persistence.*;
@@ -14,10 +15,11 @@ import java.util.List;
 
 @Entity
 @Data
+
 public class AdminEntity implements UserDetails {
 
     @Id
-    private String email;
+    private String adminEmail;
 
     private String Password;
 
@@ -26,9 +28,11 @@ public class AdminEntity implements UserDetails {
 
     @ManyToOne
     @JoinColumn(name = "companyName" , nullable=false)
+    @JsonIgnore
     public CompanyEntity company;
 
     @OneToMany(mappedBy = "adminEntity" , cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<EmployeeEntity> employeeEntities;
 
     @Override
@@ -39,7 +43,7 @@ public class AdminEntity implements UserDetails {
     @Override
     public String toString() {
         return "AdminEntity{" +
-                "email='" + email + '\'' +
+                "email='" + adminEmail + '\'' +
                 ", Password='" + Password + '\'' +
                 ", role=" + role +
                 ", company=" + company +
@@ -48,6 +52,6 @@ public class AdminEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.email;
+        return this.adminEmail;
     }
 }

@@ -12,5 +12,5 @@ public interface EmployeeService {
 
     List<EmployeeDto> GetEmployeesByCompanyName(String companyName);
 
-
+    List<EmployeeDto> GetEmployeesByAdminName(String admin);
 }

@@ -7,7 +7,6 @@ import com.industry.company.Company_service.Repository.AdminRepository;
 import com.industry.company.Company_service.Repository.CompanyRepository;
 import com.industry.company.Company_service.Repository.SuperAdminRepository;
 import com.industry.company.Company_service.exception.ResourceNotFoundException;
-import com.openhtmltopdf.css.parser.property.PrimitivePropertyBuilders;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,36 +21,49 @@ import org.springframework.stereotype.Service;
 public class SuperAdminUserDetailsService implements UserDetailsService {
 
     private final SuperAdminRepository superAdminRepository;
-
     private final CompanyRepository companyRepository;
-
     private final AdminRepository adminRepository;
-
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        log.info("fetching Super Admin");
-        return (UserDetails) superAdminRepository.findById(email).orElseThrow(()-> new ResourceNotFoundException("Super Admin Not Found"));
+        log.info("Fetching Super Admin with email: {}", email);
+        return superAdminRepository.findById(email)
+                .orElseThrow(() -> {
+                    log.warn("Super Admin not found for email: {}", email);
+                    return new ResourceNotFoundException("Super Admin Not Found");
+                });
     }
 
-    public AdminEntity addAdminForCompany(AdminEntity adminEntity , String companyName) {
+    public AdminEntity addAdminForCompany(AdminEntity adminEntity, String companyName) {
+        log.info("Adding new Admin '{}' for company '{}'", adminEntity.getAdminEmail(), companyName);
 
-        CompanyEntity company =companyRepository
-                .findByCompanyName(companyName)
-                .orElseThrow(()-> new ResourceNotFoundException("Company Not Found With Name "+ companyName));
+        CompanyEntity company = companyRepository.findByCompanyName(companyName)
+                .orElseThrow(() -> {
+                    log.warn("Company not found with name: {}", companyName);
+                    return new ResourceNotFoundException("Company Not Found With Name " + companyName);
+                });
 
         adminEntity.setPassword(passwordEncoder.encode(adminEntity.getPassword()));
         adminEntity.setCompany(company);
         adminRepository.save(adminEntity);
 
+        log.info("Admin '{}' successfully added for company '{}'", adminEntity.getAdminEmail(), companyName);
         return adminEntity;
     }
 
     public void updatePassword(String username, String newPassword) {
+        log.info("Updating password for Super Admin: {}", username);
+
         SuperAdminEntity entity = superAdminRepository.findById(username)
-                .orElseThrow(() -> new ResourceNotFoundException("Not found"));
+                .orElseThrow(() -> {
+                    log.warn("Super Admin not found for password update: {}", username);
+                    return new ResourceNotFoundException("Not found");
+                });
+
         entity.setPassword(passwordEncoder.encode(newPassword));
         superAdminRepository.save(entity);
+
+        log.info("Password updated successfully for Super Admin: {}", username);
     }
 }

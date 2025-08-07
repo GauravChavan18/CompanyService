@@ -21,14 +21,26 @@ public class AdminUserDetails implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        log.info("fetching Admin");
-        return adminRepository.findById(email).orElseThrow(()-> new ResourceNotFoundException("Admin not found"));
+        log.info("Fetching admin with email: {}", email);
+        return adminRepository.findById(email)
+                .orElseThrow(() -> {
+                    log.warn("Admin not found for email: {}", email);
+                    return new ResourceNotFoundException("Admin not found");
+                });
     }
 
     public void updatePassword(String username, String newPassword) {
+        log.info("Updating password for admin: {}", username);
+
         AdminEntity entity = adminRepository.findById(username)
-                .orElseThrow(() -> new ResourceNotFoundException("Not found"));
+                .orElseThrow(() -> {
+                    log.warn("Admin not found for password update, email: {}", username);
+                    return new ResourceNotFoundException("Admin not found");
+                });
+
         entity.setPassword(passwordEncoder.encode(newPassword));
         adminRepository.save(entity);
+
+        log.info("Password updated successfully for admin: {}", username);
     }
 }

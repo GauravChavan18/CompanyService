@@ -15,6 +15,7 @@ import java.util.Locale;
 
 @Entity
 @Data
+
 public class EmployeeEntity {
 
     @Id
@@ -63,7 +64,7 @@ public class EmployeeEntity {
     private LeaveBalanceEntity leaveBalanceEntity;
 
     @ManyToOne
-    @JoinColumn(name = "admin" ,nullable = false)
+    @JoinColumn(name = "adminEmail" ,nullable = false)
     private AdminEntity adminEntity;
 
     @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL)

@@ -14,6 +14,7 @@ import java.util.List;
 
 @Entity
 @Data
+
 public class EmployeeAuthEntity implements UserDetails {
 
     @Id
