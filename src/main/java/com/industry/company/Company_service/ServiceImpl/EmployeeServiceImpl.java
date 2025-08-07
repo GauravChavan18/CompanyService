@@ -40,12 +40,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public EmployeeDto AddEmployee(EmployeeDto employeeDto , String admin) {
 
-        EmployeeEntity employee = modelMapper.map(employeeDto,EmployeeEntity.class);
+
 
         String companyName = employeeDto.getCompanyName();
 
         CompanyEntity company = companyRepository.findByCompanyName(companyName)
                         .orElseThrow(()-> new ResourceNotFoundException("Company not found"));
+
+        EmployeeEntity employee = modelMapper.map(employeeDto,EmployeeEntity.class);
 
         AdminEntity adminEntity = adminRepository.findById(admin).orElseThrow(()-> new ResourceNotFoundException("Admin is not assigned"));
 
@@ -84,6 +86,27 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .orElseThrow(()-> new ResourceNotFoundException("Company not found"));
         log.info("in get employess");
         List<EmployeeEntity> employeeEntities =emploeeRepository.findByCompanyCompanyName(companyName);
+
+        List<EmployeeDto> employeeDtos = employeeEntities
+                .stream()
+                .map((employee -> modelMapper.map(employee ,EmployeeDto.class)))
+                .toList();
+
+
+        return employeeDtos;
+    }
+
+    @Override
+    public List<EmployeeDto> GetEmployeesByAdminName(String admin) {
+
+       log.info("Admin email {}",admin);
+
+        List<EmployeeEntity> employeeEntities = emploeeRepository.findByAdminEntityAdminEmail(admin);
+
+        if(employeeEntities.size()==0)
+        {
+            throw new ResourceNotFoundException("Employees Not Assosiated till now");
+        }
 
         List<EmployeeDto> employeeDtos = employeeEntities
                 .stream()
