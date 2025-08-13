@@ -17,9 +17,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.format.TextStyle;
 import java.util.List;
-import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +34,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeAuthEntityRepo employeeAuthEntityRepo;
 
     @Override
-    public EmployeeDto AddEmployee(EmployeeDto employeeDto , String admin) {
+    public EmployeeDto AddEmployee(EmployeeDto employeeDto, String admin) {
         log.info("AddEmployee called with admin: {}, employeeDto: {}", admin, employeeDto);
 
         String companyName = employeeDto.getCompanyName();
@@ -51,10 +49,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         EmployeeEntity employee = modelMapper.map(employeeDto, EmployeeEntity.class);
         log.debug("Mapped EmployeeDto to EmployeeEntity: {}", employee);
 
-        AdminEntity adminEntity = adminRepository.findById(admin).orElseThrow(() -> {
-            log.error("Admin not assigned: {}", admin);
-            return new ResourceNotFoundException("Admin is not assigned");
-        });
+        AdminEntity adminEntity = adminRepository.findById(admin)
+                .orElseThrow(() -> {
+                    log.error("Admin not assigned: {}", admin);
+                    return new ResourceNotFoundException("Admin is not assigned");
+                });
 
         LeaveBalanceEntity leaveBalanceEntity = new LeaveBalanceEntity();
         leaveBalanceEntity.setLeaveBalace(24L);

@@ -31,7 +31,7 @@ public class EmployeeController {
 
         log.info("AddEmployee request completed successfully for Employee Email: {}", employeedto.getEmail());
         return new ResponseEntity<>(employeedto, HttpStatus.CREATED);
-    }
+  }
 
     @GetMapping("/{companyName}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -46,6 +46,7 @@ public class EmployeeController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
+
     public ResponseEntity<List<EmployeeDto>> GetEmployeesByAdminName(Principal principal) {
         log.info("GetEmployeesByAdminName request received for admin: {}", principal.getName());
 
@@ -53,5 +54,6 @@ public class EmployeeController {
 
         log.info("Found {} employees for admin: {}", employees.size(), principal.getName());
         return new ResponseEntity<>(employees, HttpStatus.FOUND);
-    }
+   }
+        
 }
