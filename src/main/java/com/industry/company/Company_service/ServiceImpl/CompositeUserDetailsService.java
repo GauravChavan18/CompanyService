@@ -1,6 +1,6 @@
 package com.industry.company.Company_service.ServiceImpl;
 
-import com.industry.company.Company_service.AuthEntity.loginRequest;
+import com.industry.company.Company_service.AuthEntity.*;
 import com.industry.company.Company_service.Repository.AdminRepository;
 import com.industry.company.Company_service.Repository.EmployeeAuthEntityRepo;
 import com.industry.company.Company_service.Repository.SuperAdminRepository;
@@ -92,12 +92,7 @@ public class CompositeUserDetailsService implements UserDetailsService {
 
         if (username.equals(userDetails.getUsername()) && matches) {
             log.info("Password matched for user: {}", username);
-            switch (updatedBy) {
-                case "SUPERADMIN" -> superAdminUserDetailsService.updatePassword(username, newPassword);
-                case "ADMIN" -> adminUserDetails.updatePassword(username, newPassword);
-                case "EMPLOYEE" -> employeeAuthService.updatePassword(username, newPassword);
-                default -> log.error("Unknown user type: {}", updatedBy);
-            }
+            updatePassword(username, newPassword, updatedBy);
         } else {
             log.warn("Password or username mismatch for {}", username);
             return new ResponseEntity<>("Details Mismatched", HttpStatus.NOT_FOUND);
@@ -105,5 +100,63 @@ public class CompositeUserDetailsService implements UserDetailsService {
 
         log.info("Password successfully updated for user: {}", username);
         return new ResponseEntity<>(userDetails, HttpStatus.CREATED);
+    }
+
+    public void updatePassword(String username, String newPassword , String updateBy) {
+        log.info("Updating password for admin: {}", username);
+
+
+        if(updateBy.equals("EMPLOYEE"))
+        {
+            log.info("Updating password for employee: {}", username);
+
+            EmployeeAuthEntity entity = employeeAuthEntityRepo.findById(username)
+                    .orElseThrow(() -> {
+                        log.warn("Employee not found for password update, email: {}", username);
+                        return new ResourceNotFoundException("Not found");
+                    });
+
+            entity.setPassword(passwordEncoder.encode(newPassword));
+            entity.setStatus(AuthStatus.PASSWORD_SET);
+            employeeAuthEntityRepo.save(entity);
+
+            log.info("Password updated successfully for employee: {}", username);
+        }
+        else if(updateBy.equals("ADMIN"))
+        {
+            AdminEntity entity = adminRepository.findById(username)
+                    .orElseThrow(() -> {
+                        log.warn("Admin not found for password update, email: {}", username);
+                        return new ResourceNotFoundException("Admin not found");
+                    });
+
+            entity.setPassword(passwordEncoder.encode(newPassword));
+            entity.setStatus(AuthStatus.PASSWORD_SET);
+            adminRepository.save(entity);
+
+            log.info("Password updated successfully for admin: {}", username);
+        }
+        else if(updateBy.matches("SUPERADMIN")){
+            log.info("Updating password for Super Admin: {}", username);
+
+            SuperAdminEntity entity = superAdminRepository.findById(username)
+                    .orElseThrow(() -> {
+                        log.warn("Super Admin not found for password update: {}", username);
+                        return new ResourceNotFoundException("Not found");
+                    });
+
+            entity.setPassword(passwordEncoder.encode(newPassword));
+            entity.setStatus(AuthStatus.PASSWORD_SET);
+            superAdminRepository.save(entity);
+
+            log.info("Password updated successfully for Super Admin: {}", username);
+        }
+        else{
+            log.error("Unknown user type: {}", updateBy);
+        }
+
+
+
+
     }
 }

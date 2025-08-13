@@ -1,6 +1,7 @@
 package com.industry.company.Company_service.ServiceImpl;
 
 import com.industry.company.Company_service.AuthEntity.AdminEntity;
+import com.industry.company.Company_service.AuthEntity.AuthStatus;
 import com.industry.company.Company_service.AuthEntity.SuperAdminEntity;
 import com.industry.company.Company_service.Entity.CompanyEntity;
 import com.industry.company.Company_service.Repository.AdminRepository;
@@ -52,18 +53,5 @@ public class SuperAdminUserDetailsService implements UserDetailsService {
         return adminEntity;
     }
 
-    public void updatePassword(String username, String newPassword) {
-        log.info("Updating password for Super Admin: {}", username);
 
-        SuperAdminEntity entity = superAdminRepository.findById(username)
-                .orElseThrow(() -> {
-                    log.warn("Super Admin not found for password update: {}", username);
-                    return new ResourceNotFoundException("Not found");
-                });
-
-        entity.setPassword(passwordEncoder.encode(newPassword));
-        superAdminRepository.save(entity);
-
-        log.info("Password updated successfully for Super Admin: {}", username);
-    }
 }

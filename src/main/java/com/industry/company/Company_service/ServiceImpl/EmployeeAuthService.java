@@ -1,5 +1,6 @@
 package com.industry.company.Company_service.ServiceImpl;
 
+import com.industry.company.Company_service.AuthEntity.AuthStatus;
 import com.industry.company.Company_service.AuthEntity.EmployeeAuthEntity;
 import com.industry.company.Company_service.Repository.EmployeeAuthEntityRepo;
 import com.industry.company.Company_service.exception.ResourceNotFoundException;
@@ -29,18 +30,5 @@ public class EmployeeAuthService implements UserDetailsService {
                 });
     }
 
-    public void updatePassword(String username, String newPassword) {
-        log.info("Updating password for employee: {}", username);
 
-        EmployeeAuthEntity entity = employeeAuthEntityRepo.findById(username)
-                .orElseThrow(() -> {
-                    log.warn("Employee not found for password update, email: {}", username);
-                    return new ResourceNotFoundException("Not found");
-                });
-
-        entity.setPassword(passwordEncoder.encode(newPassword));
-        employeeAuthEntityRepo.save(entity);
-
-        log.info("Password updated successfully for employee: {}", username);
-    }
 }

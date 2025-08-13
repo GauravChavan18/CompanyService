@@ -35,6 +35,9 @@ public class AdminEntity implements UserDetails {
     @JsonIgnore
     private List<EmployeeEntity> employeeEntities;
 
+    @Enumerated(EnumType.STRING)
+    private AuthStatus status;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singleton(() -> "ROLE_" + this.role.name());

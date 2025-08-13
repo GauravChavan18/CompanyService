@@ -1,6 +1,7 @@
 package com.industry.company.Company_service.ServiceImpl;
 
 import com.industry.company.Company_service.AuthEntity.AdminEntity;
+import com.industry.company.Company_service.AuthEntity.AuthStatus;
 import com.industry.company.Company_service.Repository.AdminRepository;
 import com.industry.company.Company_service.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -29,18 +30,5 @@ public class AdminUserDetails implements UserDetailsService {
                 });
     }
 
-    public void updatePassword(String username, String newPassword) {
-        log.info("Updating password for admin: {}", username);
 
-        AdminEntity entity = adminRepository.findById(username)
-                .orElseThrow(() -> {
-                    log.warn("Admin not found for password update, email: {}", username);
-                    return new ResourceNotFoundException("Admin not found");
-                });
-
-        entity.setPassword(passwordEncoder.encode(newPassword));
-        adminRepository.save(entity);
-
-        log.info("Password updated successfully for admin: {}", username);
-    }
 }
