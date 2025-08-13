@@ -8,10 +8,11 @@ import java.util.List;
 
 public interface PaySlipService {
 
-    PaySlip CreatePaySlip(Long id , Earnings earnings);
+    PaySlip CreatePaySlip(Long id , Earnings earnings , String email);
 
-    PaySlip CreatePaySlipByMonth(Long id , String Month ,Earnings earnings);
+    PaySlip CreatePaySlipByMonth(Long id , String Month ,Earnings earnings , String email);
 
-    List<PaySlip> getAllPlayslipsByEmployeeeId(Long id);
-    void getPaySlipPdfByEmployeeIdAndMonth(Long id , String PayMonth , OutputStream outputStream);
+    List<PaySlip> getAllPlayslipsByEmployeeeId(Long id , String email);
+
+    void getPaySlipPdfByEmployeeIdAndMonth(Long id , String PayMonth , OutputStream outputStream , String email);
 }

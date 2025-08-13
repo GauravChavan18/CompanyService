@@ -85,7 +85,6 @@ public class LeaveServiceImpl implements LeaveService {
             }
             leaveRequest.setLeaveRequestStatus(LeaveRequestStatus.APPROVED);
             leaveRepository.save(leaveRequest);
-
         });
 
     }

@@ -1,25 +1,26 @@
 package com.industry.company.Company_service.ServiceImpl;
 
+import com.industry.company.Company_service.AuthEntity.AdminEntity;
 import com.industry.company.Company_service.Dto.PunchRequestDto;
 import com.industry.company.Company_service.Entity.AttendanceRecord;
 import com.industry.company.Company_service.Entity.AttendenceStatus;
 import com.industry.company.Company_service.Entity.EmployeeEntity;
 import com.industry.company.Company_service.Entity.LeaveRequest;
-import com.industry.company.Company_service.Repository.AttendenceRepository;
-import com.industry.company.Company_service.Repository.EmploeeRepository;
-import com.industry.company.Company_service.Repository.LeaveRepository;
-import com.industry.company.Company_service.Repository.PaySlipRepository;
+import com.industry.company.Company_service.Repository.*;
 import com.industry.company.Company_service.Service.AttendenceRecordService;
 import com.industry.company.Company_service.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +34,8 @@ public class AttendenceRecordServiceImpl implements AttendenceRecordService {
     private final EmploeeRepository emploeeRepository;
 
     private  final LeaveRepository leaveRepository;
+
+    private final AdminRepository adminRepository;
 
     @Override
     public AttendanceRecord FillAttendenceForDay(PunchRequestDto punchRequestDto, Long employeeId) {
@@ -95,18 +98,32 @@ public class AttendenceRecordServiceImpl implements AttendenceRecordService {
     }
 
     @Override
-    public List<AttendanceRecord> FillAttendenceForMonth(List<PunchRequestDto> punchRequestDtos, Long employeeId) {
+    public List<AttendanceRecord> FillAttendenceForMonth(List<PunchRequestDto> punchRequestDtos, Long employeeId, String adminEmail) {
 
+        EmployeeEntity employee = emploeeRepository.findById(employeeId)
+                .orElseThrow(()->new ResourceNotFoundException("Employee not found"));
+
+
+        if(!employee.getAdminEntity().getAdminEmail().equals(adminEmail))
+        {
+            throw new AccessDeniedException("You are not authorized");
+        }
 
        return punchRequestDtos.stream().map((punchRequestDto -> FillAttendenceForDay(punchRequestDto, employeeId))).toList();
 
     }
 
     @Override
-    public List<AttendanceRecord> GetAttendenceByEmployeeForMonth(Long employeeId , String payMonth) {
+    public List<AttendanceRecord> GetAttendenceByEmployeeForMonth(Long employeeId , String payMonth , String email) {
 
-        EmployeeEntity employee = emploeeRepository.findById(employeeId)
-                .orElseThrow(()->new ResourceNotFoundException("Employee not found"));
+
+        boolean exists = emploeeRepository.findById(employeeId).isPresent()
+                || adminRepository.findById(email).isPresent();
+
+        if(!exists)
+        {
+            throw new ResourceNotFoundException("Entity Not Found");
+        }
 
         List<AttendanceRecord> attendanceRecordList = attendenceRepository.findByEmployeeEmployeeIdAndPayMonth(employeeId ,payMonth);
 

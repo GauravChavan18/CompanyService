@@ -1,6 +1,7 @@
 package com.industry.company.Company_service.AuthEntity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.industry.company.Company_service.Entity.CompanyEntity;
 import com.industry.company.Company_service.Entity.EmployeeEntity;
 import jakarta.persistence.*;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Entity
 @Data
+
 public class AdminEntity implements UserDetails {
 
     @Id
@@ -26,10 +28,15 @@ public class AdminEntity implements UserDetails {
 
     @ManyToOne
     @JoinColumn(name = "companyName" , nullable=false)
+    @JsonIgnore
     public CompanyEntity company;
 
     @OneToMany(mappedBy = "adminEntity" , cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<EmployeeEntity> employeeEntities;
+
+    @Enumerated(EnumType.STRING)
+    private AuthStatus status;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

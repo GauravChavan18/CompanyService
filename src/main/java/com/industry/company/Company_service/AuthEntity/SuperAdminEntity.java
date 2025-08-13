@@ -25,6 +25,9 @@ public class SuperAdminEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Roles role;
 
+    @Enumerated(EnumType.STRING)
+    private AuthStatus status;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singleton(() -> "ROLE_" + this.role.name());

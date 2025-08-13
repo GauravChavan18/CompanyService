@@ -15,6 +15,7 @@ import java.util.Locale;
 
 @Entity
 @Data
+
 public class EmployeeEntity {
 
     @Id
